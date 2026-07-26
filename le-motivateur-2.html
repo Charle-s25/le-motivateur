@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Motivateur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;1,9..144,400;1,9..144,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#ECE7DC;
+    --card:#FBF9F4;
+    --ink:#242220;
+    --ink-soft:#5B564E;
+    --wine:#7A3243;
+    --wine-soft:#a9788b;
+    --line:#D9D2C2;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html{ scroll-behavior:smooth; }
+
+  body{
+    margin:0;
+    min-height:100vh;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Work Sans', sans-serif;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:6vh 5vw;
+    transition:background-color 0.7s ease, color 0.7s ease;
+  }
+
+  body, .card, h1, blockquote, .attribution, .context, .eyebrow-top,
+  .card-eyebrow, .subtitle, .counter, .copy-hint,
+  button.generate, .divider{
+    transition:background-color 0.7s ease, color 0.7s ease, border-color 0.7s ease;
+  }
+
+  header{
+    text-align:center;
+    margin-bottom:clamp(2.5rem, 6vh, 4rem);
+  }
+
+  .eyebrow-top{
+    font-size:0.7rem;
+    letter-spacing:0.28em;
+    text-transform:uppercase;
+    color:var(--wine);
+    margin:0 0 0.9rem;
+    font-weight:600;
+  }
+
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(2rem, 5vw, 3.2rem);
+    margin:0 0 0.6rem;
+    letter-spacing:-0.01em;
+  }
+
+  .subtitle{
+    font-size:0.95rem;
+    color:var(--ink-soft);
+    max-width:36ch;
+    margin:0 auto;
+    line-height:1.5;
+    font-style:italic;
+    font-family:'Fraunces', serif;
+  }
+
+  main{
+    width:100%;
+    max-width:620px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+  .card{
+    position:relative;
+    width:100%;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:clamp(2.2rem, 6vw, 3.6rem) clamp(1.8rem, 6vw, 3.2rem) clamp(1.8rem, 5vw, 2.6rem);
+    box-shadow:0 1px 2px rgba(36,34,32,0.04), 0 18px 40px -22px rgba(36,34,32,0.35);
+    opacity:0;
+    transform:translateY(10px);
+    transition:opacity 0.55s ease, transform 0.55s ease;
+  }
+
+  .card.visible{
+    opacity:1;
+    transform:translateY(0);
+  }
+
+  .card-eyebrow{
+    font-size:0.68rem;
+    letter-spacing:0.24em;
+    text-transform:uppercase;
+    color:var(--wine);
+    font-weight:600;
+    margin:0 0 1.4rem;
+    display:flex;
+    align-items:center;
+    gap:0.6rem;
+  }
+
+  .card-eyebrow::after{
+    content:'';
+    flex:1;
+    height:1px;
+    background:var(--line);
+  }
+
+  .quote-mark{
+    font-family:'Fraunces', serif;
+    font-size:3rem;
+    line-height:0.5;
+    color:var(--wine-soft);
+    display:block;
+    margin-bottom:0.6rem;
+    opacity:0.55;
+  }
+
+  blockquote{
+    margin:0;
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-weight:400;
+    font-size:clamp(1.35rem, 3.4vw, 1.75rem);
+    line-height:1.42;
+    color:var(--ink);
+  }
+
+  .attribution{
+    margin:1.3rem 0 0;
+    font-family:'Work Sans', sans-serif;
+    font-size:0.85rem;
+    font-weight:500;
+    color:var(--ink-soft);
+    letter-spacing:0.02em;
+  }
+
+  .attribution::before{
+    content:'— ';
+  }
+
+  .divider{
+    border:none;
+    border-top:1px dashed var(--line);
+    margin:1.7rem 0 1.3rem;
+  }
+
+  .context-label{
+    font-size:0.64rem;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color:var(--wine-soft);
+    font-weight:600;
+    margin:0 0 0.5rem;
+  }
+
+  .context{
+    margin:0;
+    font-size:0.92rem;
+    line-height:1.55;
+    color:var(--ink-soft);
+    font-style:italic;
+  }
+
+  .controls{
+    margin-top:2.4rem;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:0.9rem;
+  }
+
+  button.generate{
+    font-family:'Work Sans', sans-serif;
+    font-size:0.85rem;
+    font-weight:600;
+    letter-spacing:0.03em;
+    color:var(--card);
+    background:var(--ink);
+    border:none;
+    padding:0.95rem 2.2rem;
+    border-radius:2px;
+    cursor:pointer;
+    transition:background 0.25s ease, transform 0.15s ease;
+  }
+
+  button.generate:hover{
+    background:var(--wine);
+  }
+
+  button.generate:active{
+    transform:scale(0.97);
+  }
+
+  button.generate:focus-visible{
+    outline:2px solid var(--wine);
+    outline-offset:3px;
+  }
+
+  .counter{
+    font-family:'Fraunces', serif;
+    font-variant-numeric:tabular-nums;
+    font-size:0.78rem;
+    color:var(--ink-soft);
+    letter-spacing:0.05em;
+  }
+
+  .secondary-actions{
+    display:flex;
+    align-items:center;
+    gap:0.6rem;
+  }
+
+  .dot-sep{
+    color:var(--line);
+    font-size:0.72rem;
+  }
+
+  .copy-hint{
+    font-size:0.72rem;
+    color:var(--ink-soft);
+    opacity:0.7;
+    background:none;
+    border:none;
+    text-decoration:underline;
+    text-underline-offset:3px;
+    cursor:pointer;
+    font-family:'Work Sans', sans-serif;
+    padding:0.2rem;
+  }
+
+  .copy-hint:focus-visible{
+    outline:2px solid var(--wine);
+    outline-offset:2px;
+  }
+
+  footer{
+    margin-top:3rem;
+    font-size:0.68rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    opacity:0.55;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .card, html{ transition:none; scroll-behavior:auto; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="eyebrow-top">Cabinet des pensées profondes</p>
+  <h1>Le Motivateur</h1>
+  <p class="subtitle">De vraies citations. De vrais proverbes. Des circonstances qui, elles, le sont beaucoup moins.</p>
+</header>
+
+<main>
+  <div class="card" id="card">
+    <p class="card-eyebrow" id="category">Citation</p>
+    <span class="quote-mark">“</span>
+    <blockquote id="quote">Chargement d'une pensée…</blockquote>
+    <p class="attribution" id="author">—</p>
+    <hr class="divider">
+    <p class="context-label">Contexte réel</p>
+    <p class="context" id="context">…</p>
+  </div>
+
+  <div class="controls">
+    <button class="generate" id="generateBtn">Générer une pensée</button>
+    <div class="secondary-actions">
+      <button class="copy-hint" id="copyBtn">Copier le texte</button>
+      <span class="dot-sep">·</span>
+      <button class="copy-hint" id="shareBtn">Partager en image</button>
+      <span class="dot-sep">·</span>
+      <button class="copy-hint" id="bgPhotoBtn">Utiliser ma photo</button>
+    </div>
+    <input type="file" accept="image/*" id="bgPhotoInput" hidden>
+    <p class="counter" id="counter">Pensée n° 000</p>
+  </div>
+</main>
+
+<footer>Aucune de ces personnes n'a validé le contexte</footer>
+
+<script>
+const THOUGHTS = [
+  { cat:"Proverbe", quote:"Petit à petit, l'oiseau fait son nid.", author:"Proverbe français", context:"Dit par un stagiaire après avoir rempli sa troisième case Excel de la journée." },
+  { cat:"Proverbe", quote:"L'habit ne fait pas le moine.", author:"Proverbe français", context:"Prononcé en fixant un collègue arrivé en pyjama à la visio de 9h." },
+  { cat:"Proverbe", quote:"Qui vole un œuf, vole un bœuf.", author:"Proverbe français", context:"Chuchoté par un client qui vient de piquer une dosette de café en salle de pause." },
+  { cat:"Proverbe", quote:"Rome ne s'est pas faite en un jour.", author:"Proverbe", context:"Dit en attendant que la page charge sur le wifi de l'aéroport." },
+  { cat:"Proverbe", quote:"Après la pluie, le beau temps.", author:"Proverbe", context:"Dit en sortant de la station de lavage avec la voiture encore sale." },
+  { cat:"Proverbe", quote:"Il n'y a pas de fumée sans feu.", author:"Proverbe", context:"Dit en regardant l'alarme incendie du bureau se déclencher à cause du micro-ondes." },
+  { cat:"Proverbe", quote:"Mieux vaut tard que jamais.", author:"Proverbe", context:"Envoyé par texto trois heures après le rendez-vous manqué." },
+  { cat:"Proverbe", quote:"Qui ne tente rien n'a rien.", author:"Proverbe", context:"Dit juste avant de cliquer sur « acheter maintenant » à deux heures du matin." },
+  { cat:"Proverbe", quote:"Chat échaudé craint l'eau froide.", author:"Proverbe", context:"Dit en soufflant longuement sur un yaourt à température ambiante." },
+  { cat:"Proverbe", quote:"Pierre qui roule n'amasse pas mousse.", author:"Proverbe", context:"Dit à un collègue qui change d'abonnement de streaming pour la quatrième fois du mois." },
+  { cat:"Proverbe", quote:"Tel est pris qui croyait prendre.", author:"Proverbe", context:"Dit en regardant quelqu'un se faire piéger par la porte automatique du supermarché." },
+  { cat:"Proverbe", quote:"L'union fait la force.", author:"Proverbe", context:"Dit en poussant à trois une voiture en panne d'essence sur cent mètres." },
+  { cat:"Proverbe", quote:"Les cordonniers sont toujours les plus mal chaussés.", author:"Proverbe français", context:"Dit en remarquant que le dentiste du quartier a une dent cassée." },
+  { cat:"Proverbe", quote:"Il faut battre le fer tant qu'il est chaud.", author:"Proverbe français", context:"Dit en se ruant sur le dernier croissant avant qu'il refroidisse." },
+  { cat:"Proverbe", quote:"Tout ce qui brille n'est pas or.", author:"Proverbe français", context:"Dit en réalisant que la bague à deux euros a verdi le doigt." },
+  { cat:"Proverbe", quote:"Vouloir, c'est pouvoir.", author:"Proverbe français", context:"Dit juste avant d'abandonner le montage du meuble en kit." },
+  { cat:"Proverbe", quote:"L'exception confirme la règle.", author:"Proverbe français", context:"Dit en justifiant la troisième part de gâteau de la soirée." },
+  { cat:"Proverbe", quote:"Aide-toi, le ciel t'aidera.", author:"Proverbe français", context:"Dit en cherchant désespérément le bouton d'assistance du logiciel." },
+  { cat:"Proverbe", quote:"Un tiens vaut mieux que deux tu l'auras.", author:"Proverbe français", context:"Dit en refusant d'échanger son siège côté fenêtre contre deux promesses vagues." },
+  { cat:"Proverbe", quote:"Il ne faut pas mettre tous ses œufs dans le même panier.", author:"Proverbe français", context:"Dit en répartissant les restes du frigo dans sept boîtes différentes." },
+  { cat:"Proverbe", quote:"Les murs ont des oreilles.", author:"Proverbe français", context:"Dit en chuchotant devant la cloison en carton-plâtre du bureau." },
+  { cat:"Proverbe", quote:"Charbonnier est maître chez soi.", author:"Proverbe français", context:"Dit en refusant catégoriquement de changer la chaîne de télévision." },
+  { cat:"Proverbe", quote:"Ventre affamé n'a pas d'oreilles.", author:"Proverbe français", context:"Dit en zappant une réunion pour foncer à la cantine." },
+  { cat:"Proverbe", quote:"Qui sème le vent récolte la tempête.", author:"Proverbe français", context:"Dit après avoir répondu à tout le monde en « répondre à tous » par erreur." },
+  { cat:"Proverbe", quote:"Les bons comptes font les bons amis.", author:"Proverbe français", context:"Dit en sortant la calculatrice pour partager une pizza à quatre." },
+  { cat:"Proverbe", quote:"Il vaut mieux prévenir que guérir.", author:"Proverbe français", context:"Dit en emportant un parapluie sous un grand soleil." },
+  { cat:"Proverbe", quote:"Petit poisson deviendra grand.", author:"Proverbe français", context:"Dit devant un cactus qui n'a toujours pas bougé depuis six mois." },
+  { cat:"Proverbe", quote:"On ne peut pas avoir le beurre et l'argent du beurre.", author:"Proverbe français", context:"Dit en réclamant la monnaie ET le sachet gratuit." },
+  { cat:"Proverbe", quote:"À bon entendeur, salut.", author:"Proverbe français", context:"Dit en raccrochant au nez d'un démarcheur téléphonique." },
+  { cat:"Proverbe", quote:"Loin des yeux, loin du cœur.", author:"Proverbe français", context:"Dit en retrouvant un yaourt tout au fond du frigo, périmé depuis trois semaines." },
+  { cat:"Proverbe", quote:"Tout vient à point à qui sait attendre.", author:"Proverbe français", context:"Dit devant le micro-ondes, à quinze secondes de la fin." },
+  { cat:"Proverbe", quote:"L'occasion fait le larron.", author:"Proverbe français", context:"Dit en piochant discrètement dans le paquet de bonbons du collègue absent." },
+  { cat:"Proverbe", quote:"Qui trop embrasse mal étreint.", author:"Proverbe français", context:"Dit en essayant de refermer huit onglets de navigateur à la fois." },
+  { cat:"Proverbe", quote:"Il n'est jamais trop tard pour bien faire.", author:"Proverbe français", context:"Dit en envoyant enfin ses vœux de nouvelle année, le 15 février." },
+  { cat:"Proverbe", quote:"Chacun voit midi à sa porte.", author:"Proverbe français", context:"Dit lors d'un débat sur la bonne heure pour manger une raclette." },
+  { cat:"Proverbe", quote:"Deux avis valent mieux qu'un.", author:"Proverbe français", context:"Dit en demandant son avis au chat sur le choix du canapé." },
+  { cat:"Proverbe", quote:"La nuit porte conseil.", author:"Proverbe français", context:"Dit en repoussant une décision pour la trois centième fois consécutive." },
+  { cat:"Proverbe", quote:"Quand le vin est tiré, il faut le boire.", author:"Proverbe français", context:"Dit en terminant un paquet de chips déjà entamé." },
+  { cat:"Proverbe", quote:"Qui court deux lièvres à la fois n'en attrape aucun.", author:"Proverbe français", context:"Dit en essayant de répondre à trois messages tout en cuisinant." },
+  { cat:"Proverbe", quote:"Il faut savoir donner sa langue au chat.", author:"Proverbe français", context:"Dit après vingt minutes passées sur une grille de sudoku." },
+  { cat:"Proverbe", quote:"Tel père, tel fils.", author:"Proverbe français", context:"Dit en surprenant le petit dernier en train de faire la sieste sur le canapé, comme papa." },
+  { cat:"Proverbe", quote:"Les grands esprits se rencontrent.", author:"Proverbe français", context:"Dit en découvrant que deux collègues ont commandé exactement le même sandwich." },
+  { cat:"Citation motivante", quote:"Le succès, c'est aller d'échec en échec sans perdre son enthousiasme.", author:"Winston Churchill", context:"Dit en apprenant que le distributeur de la salle de pause a encore avalé sa pièce." },
+  { cat:"Citation motivante", quote:"La vie, c'est ce qui arrive pendant qu'on fait d'autres projets.", author:"John Lennon", context:"Dit en découvrant que le livreur est passé exactement pendant la douche." },
+  { cat:"Citation motivante", quote:"Je n'ai pas échoué. J'ai simplement trouvé dix mille solutions qui ne fonctionnaient pas.", author:"Thomas Edison", context:"Dit en cherchant la télécommande dans les coussins du canapé." },
+  { cat:"Citation motivante", quote:"Ce qui ne nous tue pas nous rend plus fort.", author:"Friedrich Nietzsche", context:"Dit en avalant par erreur un piment entier dans la salade." },
+  { cat:"Citation motivante", quote:"Il n'y a qu'une façon d'échouer, c'est d'abandonner avant d'avoir réussi.", author:"Georges Clemenceau", context:"Dit à un ami qui relance la manette pour la quatrième partie d'affilée." },
+  { cat:"Citation motivante", quote:"Fais de ta vie un rêve, et d'un rêve, une réalité.", author:"Antoine de Saint-Exupéry", context:"Dit en réussissant enfin à régler le réveil sur 7h et pas 7h15." },
+  { cat:"Citation motivante", quote:"Le futur appartient à ceux qui croient à la beauté de leurs rêves.", author:"Eleanor Roosevelt", context:"Dit en remplissant un ticket de loto au bureau de tabac." },
+  { cat:"Citation motivante", quote:"On ne voit bien qu'avec le cœur.", author:"Antoine de Saint-Exupéry", context:"Dit en cherchant partout ses lunettes, posées sur son front." },
+  { cat:"Citation motivante", quote:"Le plus grand risque est de ne prendre aucun risque.", author:"Mark Zuckerberg", context:"Dit en optant pour le supplément fromage sur la pizza." },
+  { cat:"Citation motivante", quote:"Le pessimiste voit la difficulté dans chaque opportunité.", author:"Winston Churchill", context:"Dit en regardant la notice de montage d'un meuble en kit." },
+  { cat:"Parole de réussite", quote:"Restez affamés, restez fous.", author:"Steve Jobs", context:"Dit devant le frigo ouvert à vingt-trois heures passées." },
+  { cat:"Parole de réussite", quote:"Le talent gagne des matchs, mais le travail d'équipe gagne des championnats.", author:"Michael Jordan", context:"Dit pendant une partie de babyfoot acharnée à la pause déjeuner." },
+  { cat:"Parole de réussite", quote:"Si vous n'y croyez pas vous-même, personne ne le fera.", author:"Kobe Bryant", context:"Dit en défendant becs et ongles son choix d'ananas sur la pizza." },
+  { cat:"Parole de réussite", quote:"Vous ratez cent pour cent des tirs que vous ne tentez pas.", author:"Wayne Gretzky", context:"Dit juste avant de viser la corbeille avec une boulette de papier depuis l'autre bout du bureau." },
+  { cat:"Parole de réussite", quote:"Ne cherchez pas à devenir un homme qui a du succès, mais un homme qui a de la valeur.", author:"Albert Einstein", context:"Dit en négociant fermement le prix d'un canapé d'occasion en ligne." },
+  { cat:"Parole de réussite", quote:"Le prix du succès, c'est le travail.", author:"Vince Lombardi", context:"Dit en cherchant désespérément un raccourci sur l'application de plan." },
+  { cat:"Parole de réussite", quote:"Votre temps est limité, ne le gâchez pas à vivre la vie de quelqu'un d'autre.", author:"Steve Jobs", context:"Dit en refermant enfin les réseaux sociaux après quarante-cinq minutes de défilement." },
+  { cat:"Parole de réussite", quote:"L'échec est simplement l'opportunité de recommencer, cette fois plus intelligemment.", author:"Henry Ford", context:"Dit en remontant un meuble en kit pour la deuxième fois." },
+  { cat:"Parole de réussite", quote:"Ce sont nos choix qui montrent qui nous sommes vraiment.", author:"J.K. Rowling", context:"Dit debout devant le rayon des chips, un vendredi soir." },
+  { cat:"Parole de réussite", quote:"Le succès n'est pas final, l'échec n'est pas fatal, seul compte le courage de continuer.", author:"Winston Churchill", context:"Dit en relançant un niveau de jeu vidéo raté pour la douzième fois." },
+  { cat:"Citation motivante", quote:"Je ne sais pas ce que ça fait d'être née riche, mais je le demanderai à mes enfants.", author:"Anonyme", context:"Dit après avoir perdu au Monopoly pour la troisième fois de suite." },
+  { cat:"Citation motivante", quote:"Si ça te fait peur, c'est probablement la direction à suivre.", author:"Anonyme", context:"Dit juste avant de publier un message sans l'avoir relu une seule fois." },
+  { cat:"Citation motivante", quote:"Le courage, ce n'est pas l'absence de peur, c'est le fait d'avancer malgré elle.", author:"Anonyme", context:"Dit en goûtant enfin le plat trop épicé que tout le monde évite au buffet." },
+  { cat:"Citation motivante", quote:"Chaque jour est une nouvelle chance de devenir meilleur.", author:"Anonyme", context:"Dit en remettant les pieds dans une salle de sport pour la première fois depuis l'inscription." },
+  { cat:"Citation motivante", quote:"Ce n'est pas la force du vent qui compte, mais la direction que tu donnes à tes voiles.", author:"Anonyme", context:"Dit en réglant enfin le GPS pour éviter les bouchons habituels." },
+  { cat:"Citation motivante", quote:"N'attends pas que la vie soit facile pour être heureux, rends-la belle même dans la difficulté.", author:"Anonyme", context:"Dit en accrochant une guirlande lumineuse le jour où le chauffage tombe en panne." },
+  { cat:"Citation motivante", quote:"Ne te compare pas, concentre-toi. Chacun a son propre chemin.", author:"Anonyme", context:"Dit en fermant l'appli de course à pied juste après avoir vu le classement des amis." },
+  { cat:"Citation motivante", quote:"La motivation te fait commencer, l'habitude te fait continuer.", author:"Anonyme", context:"Dit en repoussant le réveil pour la sixième fois d'affilée." },
+  { cat:"Citation motivante", quote:"Un objectif sans plan n'est qu'un souhait.", author:"Anonyme", context:"Dit devant une liste de bonnes résolutions écrite le 1er janvier à 23h58." },
+  { cat:"Citation motivante", quote:"On ne construit rien de grand dans sa zone de confort.", author:"Anonyme", context:"Dit en sortant enfin de la couette un dimanche à midi." },
+  { cat:"Citation motivante", quote:"Le doute tue plus de rêves que l'échec.", author:"Anonyme", context:"Dit en supprimant un brouillon de mail pour la quatrième fois." },
+  { cat:"Citation motivante", quote:"Fais aujourd'hui ce que les autres ne veulent pas faire, pour vivre demain comme les autres ne peuvent pas.", author:"Anonyme", context:"Dit en acceptant enfin de trier le tiroir à bazar de la cuisine." },
+  { cat:"Citation motivante", quote:"Tu n'as pas besoin d'être extraordinaire pour commencer, tu dois commencer pour devenir extraordinaire.", author:"Anonyme", context:"Dit en s'inscrivant à un cours de poterie trouvé au hasard." },
+  { cat:"Citation motivante", quote:"La discipline, c'est se souvenir de ce que l'on veut vraiment.", author:"Anonyme", context:"Dit en résistant à un deuxième croissant, pendant sept secondes entières." },
+  { cat:"Citation motivante", quote:"Les grandes choses ne se font jamais dans le confort.", author:"Anonyme", context:"Dit en changeant enfin de position sur le canapé." },
+  { cat:"Citation motivante", quote:"Chaque expert a un jour été un débutant.", author:"Anonyme", context:"Dit en ratant une nouvelle fois la pâte à crêpes." },
+  { cat:"Citation motivante", quote:"Ce n'est pas parce que c'est difficile qu'on n'ose pas, c'est parce qu'on n'ose pas que c'est difficile.", author:"Anonyme", context:"Dit avant d'appeler enfin le service client après quarante minutes d'attente." },
+  { cat:"Citation motivante", quote:"Un rêve devient un objectif quand on lui donne une date.", author:"Anonyme", context:"Dit en cochant une case sur un vieux calendrier de l'année dernière." },
+  { cat:"Citation motivante", quote:"Le succès, c'est la somme de petits efforts répétés jour après jour.", author:"Anonyme", context:"Dit en arrosant une plante pour la première fois depuis trois semaines." },
+  { cat:"Citation motivante", quote:"Ne baisse jamais les bras, ce serait dommage juste avant le miracle.", author:"Anonyme", context:"Dit en secouant une dernière fois une télécommande aux piles mortes." },
+  { cat:"Citation motivante", quote:"Le meilleur moment pour commencer, c'était hier. Le deuxième meilleur, c'est maintenant.", author:"Anonyme", context:"Dit en ouvrant enfin un carton de déménagement, un an après." },
+  { cat:"Citation motivante", quote:"Tu es plus fort que tes excuses.", author:"Anonyme", context:"Dit en repoussant la vaisselle à demain, encore une fois." },
+  { cat:"Citation motivante", quote:"L'échec n'est pas l'opposé du succès, il en fait partie.", author:"Anonyme", context:"Dit en ramassant les morceaux du vase renversé par le chat." },
+  { cat:"Citation motivante", quote:"Avance, même lentement, tant que tu n'arrêtes pas.", author:"Anonyme", context:"Dit en marchant derrière quelqu'un qui traîne dans le couloir du métro." },
+  { cat:"Citation motivante", quote:"Le changement commence à la fin de ta zone de confort.", author:"Anonyme", context:"Dit en essayant enfin le yaourt à la saveur bizarre en promotion." },
+  { cat:"Citation motivante", quote:"Crois en toi, même quand personne d'autre n'y croit.", author:"Anonyme", context:"Dit en défiant des enfants de huit ans à la pétanque, très sûr de soi." },
+  { cat:"Citation motivante", quote:"Le temps que tu passes à te comparer est du temps volé à ton propre chemin.", author:"Anonyme", context:"Dit en refermant les réseaux sociaux pour la douzième fois de la journée." },
+  { cat:"Citation motivante", quote:"On ne perd jamais vraiment : soit on gagne, soit on apprend.", author:"Anonyme", context:"Dit en cherchant la notice pour comprendre pourquoi le meuble penche." },
+  { cat:"Citation motivante", quote:"La patience est amère, mais son fruit est doux.", author:"Anonyme", context:"Dit en attendant qu'une banane encore verte finisse par mûrir." },
+  { cat:"Citation motivante", quote:"Rien ne pousse dans la zone de confort, sauf la poussière.", author:"Anonyme", context:"Dit en découvrant enfin ce qu'il y a sous le lit." },
+  { cat:"Citation motivante", quote:"Il n'est jamais trop tard pour devenir ce que tu aurais pu être.", author:"Anonyme", context:"Dit en s'inscrivant à des cours de guitare à quarante ans passés." },
+  { cat:"Citation motivante", quote:"Le futur appartient à ceux qui se lèvent tôt, même pour rien.", author:"Anonyme", context:"Dit en se réveillant à six heures un samedi, sans aucune raison." },
+];
+
+const MOODS = [
+  { paper:"#ECE7DC", card:"#FBF9F4", ink:"#242220", inkSoft:"#5B564E", wine:"#7A3243", wineSoft:"#A9788B", line:"#D9D2C2" }, // Porcelaine
+  { paper:"#E3E7DE", card:"#F7F8F3", ink:"#202B22", inkSoft:"#55614F", wine:"#3F5B4E", wineSoft:"#83A08F", line:"#CBD3C4" }, // Sauge
+  { paper:"#EFE6E6", card:"#FBF4F4", ink:"#2B1F24", inkSoft:"#6B5158", wine:"#6B3350", wineSoft:"#A97690", line:"#DFC9CE" }, // Prune
+  { paper:"#E4E6EC", card:"#F6F7FA", ink:"#1F2430", inkSoft:"#545B6B", wine:"#33415C", wineSoft:"#7C89A3", line:"#CBD0DC" }, // Bleu nuit doux
+  { paper:"#EFE6DA", card:"#FBF6EE", ink:"#2E2418", inkSoft:"#6B5C48", wine:"#8A5A34", wineSoft:"#C39A72", line:"#E1D2BC" }, // Terre cuite
+  { paper:"#201F1D", card:"#2B2926", ink:"#EDE7DD", inkSoft:"#B8AFA0", wine:"#C8875E", wineSoft:"#E0AF8B", line:"#423E38" }, // Nuit
+];
+
+let lastMood = -1;
+
+function applyMood(){
+  let i;
+  do {
+    i = Math.floor(Math.random() * MOODS.length);
+  } while (i === lastMood && MOODS.length > 1);
+  lastMood = i;
+  const m = MOODS[i];
+  const root = document.documentElement.style;
+  root.setProperty('--paper', m.paper);
+  root.setProperty('--card', m.card);
+  root.setProperty('--ink', m.ink);
+  root.setProperty('--ink-soft', m.inkSoft);
+  root.setProperty('--wine', m.wine);
+  root.setProperty('--wine-soft', m.wineSoft);
+  root.setProperty('--line', m.line);
+}
+
+const card = document.getElementById('card');
+const catEl = document.getElementById('category');
+const quoteEl = document.getElementById('quote');
+const authorEl = document.getElementById('author');
+const contextEl = document.getElementById('context');
+const counterEl = document.getElementById('counter');
+const generateBtn = document.getElementById('generateBtn');
+const copyBtn = document.getElementById('copyBtn');
+const shareBtn = document.getElementById('shareBtn');
+
+let lastIndex = -1;
+let count = 0;
+
+function pad(n){ return String(n).padStart(3, '0'); }
+
+function pickThought(){
+  let i;
+  do {
+    i = Math.floor(Math.random() * THOUGHTS.length);
+  } while (i === lastIndex && THOUGHTS.length > 1);
+  lastIndex = i;
+  return THOUGHTS[i];
+}
+
+function render(thought){
+  catEl.textContent = thought.cat;
+  quoteEl.textContent = thought.quote;
+  authorEl.textContent = thought.author;
+  contextEl.textContent = thought.context;
+  count += 1;
+  counterEl.textContent = `Pensée n° ${pad(count)}`;
+}
+
+function showNext(){
+  const thought = pickThought();
+  applyMood();
+  card.classList.remove('visible');
+  window.setTimeout(() => {
+    render(thought);
+    card.classList.add('visible');
+  }, 220);
+}
+
+generateBtn.addEventListener('click', showNext);
+
+copyBtn.addEventListener('click', async () => {
+  const text = `« ${quoteEl.textContent} »\n— ${authorEl.textContent}\n\nContexte réel : ${contextEl.textContent}`;
+  try {
+    await navigator.clipboard.writeText(text);
+    const original = copyBtn.textContent;
+    copyBtn.textContent = 'Copié !';
+    window.setTimeout(() => { copyBtn.textContent = original; }, 1600);
+  } catch (e) {
+    copyBtn.textContent = 'Copie indisponible';
+  }
+});
+
+function wrapLines(ctx, text, maxWidth){
+  const words = text.split(' ');
+  const lines = [];
+  let current = '';
+  words.forEach(word => {
+    const test = current ? current + ' ' + word : word;
+    if (ctx.measureText(test).width > maxWidth && current){
+      lines.push(current);
+      current = word;
+    } else {
+      current = test;
+    }
+  });
+  if (current) lines.push(current);
+  return lines;
+}
+
+function spaced(str, gap){
+  return str.toUpperCase().split('').join(String.fromCharCode(8202).repeat(gap));
+}
+
+const SCENES = [
+  // Aube porcelaine
+  { sky:['#F3E4D2','#F0C9A8','#E7A67E'], horizonY:0.62, sun:{color:'#FFF3DE', glow:'rgba(255,230,190,0.55)'}, hills:['#C98A63','#A9633F','#7A3F2B'] },
+  // Sauge / forêt
+  { sky:['#CFE0DA','#A9C9BC','#6E9583'], horizonY:0.58, sun:{color:'#FFF6E4', glow:'rgba(255,246,228,0.4)'}, hills:['#4B6358','#33473D','#1E2C25'] },
+  // Prune / crépuscule
+  { sky:['#4A3450','#8A4F63','#D98A72'], horizonY:0.6, sun:{color:'#FFD9BE', glow:'rgba(255,200,170,0.5)'}, hills:['#3A2436','#271A28','#180F1B'] },
+  // Bleu nuit / bord de mer
+  { sky:['#B7C4D6','#7C93B4','#3B4E70'], horizonY:0.64, sun:{color:'#F3E9CF', glow:'rgba(240,225,190,0.35)'}, hills:['#33415C','#233047','#141C2C'] },
+  // Terre cuite / désert
+  { sky:['#F6D9A8','#EDA96A','#C9683F'], horizonY:0.6, sun:{color:'#FFF0D2', glow:'rgba(255,225,175,0.55)'}, hills:['#8A5A34','#6B4126','#452A18'] },
+  // Nuit étoilée
+  { sky:['#0F1622','#151E30','#1B2740'], horizonY:0.66, moon:{color:'#EDE7DD', glow:'rgba(230,225,215,0.3)'}, hills:['#161B26','#0E121A','#080a0e'] },
+];
+
+let customBgBitmap = null;
+
+const bgPhotoBtn = document.getElementById('bgPhotoBtn');
+const bgPhotoInput = document.getElementById('bgPhotoInput');
+
+bgPhotoBtn.addEventListener('click', () => {
+  if (customBgBitmap){
+    customBgBitmap = null;
+    bgPhotoBtn.textContent = 'Utiliser ma photo';
+    return;
+  }
+  bgPhotoInput.click();
+});
+
+bgPhotoInput.addEventListener('change', async () => {
+  const file = bgPhotoInput.files && bgPhotoInput.files[0];
+  if (!file) return;
+  try {
+    customBgBitmap = await createImageBitmap(file);
+    bgPhotoBtn.textContent = 'Photo activée (retirer)';
+  } catch (e) {
+    bgPhotoBtn.textContent = 'Photo illisible';
+    window.setTimeout(() => { bgPhotoBtn.textContent = 'Utiliser ma photo'; }, 1800);
+  }
+  bgPhotoInput.value = '';
+});
+
+function drawCover(ctx, img, x, y, w, h){
+  const iw = img.width, ih = img.height;
+  const scale = Math.max(w / iw, h / ih);
+  const dw = iw * scale, dh = ih * scale;
+  const dx = x + (w - dw) / 2, dy = y + (h - dh) / 2;
+  ctx.drawImage(img, dx, dy, dw, dh);
+}
+
+function drawIllustratedScene(ctx, W, H, scene){
+  const sky = ctx.createLinearGradient(0, 0, 0, H * scene.horizonY);
+  sky.addColorStop(0, scene.sky[0]);
+  sky.addColorStop(0.55, scene.sky[1]);
+  sky.addColorStop(1, scene.sky[2]);
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, W, H * scene.horizonY);
+
+  // sol / mer sous l'horizon
+  ctx.fillStyle = scene.hills[2];
+  ctx.fillRect(0, H * scene.horizonY, W, H - H * scene.horizonY);
+
+  // soleil ou lune
+  const body = scene.sun || scene.moon;
+  const bx = W * 0.72, by = H * scene.horizonY * 0.78, br = W * 0.16;
+  const glow = ctx.createRadialGradient(bx, by, 0, bx, by, br * 2.4);
+  glow.addColorStop(0, body.glow);
+  glow.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, H * scene.horizonY);
+  ctx.beginPath();
+  ctx.arc(bx, by, br, 0, Math.PI * 2);
+  ctx.fillStyle = body.color;
+  ctx.fill();
+
+  if (scene.moon){
+    // étoiles
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    let seed = 42;
+    const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+    for (let i = 0; i < 70; i++){
+      const sx = rnd() * W, sy = rnd() * H * scene.horizonY * 0.9;
+      const r = rnd() * 1.6 + 0.4;
+      ctx.globalAlpha = rnd() * 0.7 + 0.3;
+      ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // reliefs / silhouettes en couches
+  const layers = [
+    { color: scene.hills[0], base: scene.horizonY - 0.05, amp: 0.05 },
+    { color: scene.hills[1], base: scene.horizonY - 0.02, amp: 0.07 },
+  ];
+  layers.forEach((layer, li) => {
+    ctx.fillStyle = layer.color;
+    ctx.beginPath();
+    ctx.moveTo(0, H);
+    const points = 6;
+    for (let i = 0; i <= points; i++){
+      const px = (W / points) * i;
+      const wobble = Math.sin(i * 1.7 + li * 2) * layer.amp;
+      const py = H * (layer.base + wobble * 0.5);
+      ctx.lineTo(px, py);
+    }
+    ctx.lineTo(W, H);
+    ctx.closePath();
+    ctx.fill();
+  });
+
+  // reflet sur l'eau/sol
+  const reflect = ctx.createLinearGradient(0, H * scene.horizonY, 0, H);
+  reflect.addColorStop(0, 'rgba(255,255,255,0.10)');
+  reflect.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = reflect;
+  ctx.fillRect(0, H * scene.horizonY, W, (H - H * scene.horizonY) * 0.5);
+}
+
+function wrapLinesUpper(ctx, text, maxWidth){
+  return wrapLines(ctx, text, maxWidth);
+}
+
+async function buildShareImage(){
+  const W = 1080, H = 1350;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  const sceneIndex = lastMood >= 0 ? lastMood : 0;
+
+  if (customBgBitmap){
+    drawCover(ctx, customBgBitmap, 0, 0, W, H);
+  } else {
+    drawIllustratedScene(ctx, W, H, SCENES[sceneIndex]);
+  }
+
+  // voile sombre haut et bas pour la lisibilité du texte
+  const topScrim = ctx.createLinearGradient(0, 0, 0, H * 0.42);
+  topScrim.addColorStop(0, 'rgba(10,8,6,0.55)');
+  topScrim.addColorStop(1, 'rgba(10,8,6,0)');
+  ctx.fillStyle = topScrim;
+  ctx.fillRect(0, 0, W, H * 0.42);
+
+  const bottomScrim = ctx.createLinearGradient(0, H * 0.62, 0, H);
+  bottomScrim.addColorStop(0, 'rgba(8,7,6,0)');
+  bottomScrim.addColorStop(1, 'rgba(8,7,6,0.72)');
+  ctx.fillStyle = bottomScrim;
+  ctx.fillRect(0, H * 0.62, W, H * 0.38);
+
+  const marginX = 88;
+  const innerW = W - marginX * 2;
+  ctx.textBaseline = 'alphabetic';
+
+  // eyebrow
+  let y = 150;
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  ctx.font = "600 22px 'Work Sans', sans-serif";
+  ctx.fillText(spaced(catEl.textContent, 3), marginX, y);
+
+  // citation
+  y += 70;
+  ctx.fillStyle = '#FBF9F4';
+  ctx.font = "italic 500 56px 'Fraunces', serif";
+  ctx.shadowColor = 'rgba(0,0,0,0.35)';
+  ctx.shadowBlur = 18;
+  const quoteLines = wrapLinesUpper(ctx, quoteEl.textContent, innerW);
+  quoteLines.forEach(l => { y += 66; ctx.fillText(l, marginX, y); });
+  ctx.shadowBlur = 0;
+
+  // auteur
+  y += 54;
+  ctx.fillStyle = 'rgba(255,255,255,0.88)';
+  ctx.font = "500 28px 'Work Sans', sans-serif";
+  ctx.fillText('— ' + authorEl.textContent, marginX, y);
+
+  // bandeau contexte, en bas
+  const ctxLabelY = H - 250;
+  ctx.fillStyle = 'rgba(255,255,255,0.65)';
+  ctx.font = "600 18px 'Work Sans', sans-serif";
+  ctx.fillText(spaced('Contexte réel', 2), marginX, ctxLabelY);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.92)';
+  ctx.font = "italic 400 26px 'Fraunces', serif";
+  let cy = ctxLabelY;
+  const contextLines = wrapLinesUpper(ctx, contextEl.textContent, innerW - 140);
+  contextLines.forEach(l => { cy += 36; ctx.fillText(l, marginX, cy); });
+
+  // logo / filigrane bas droite, façon monogramme
+  const cx = W - 120, cyLogo = H - 100, r = 34;
+  ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(cx, cyLogo, r, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.fillStyle = '#FBF9F4';
+  ctx.font = "500 30px 'Fraunces', serif";
+  ctx.textAlign = 'center';
+  ctx.fillText('LM', cx, cyLogo + 10);
+
+  ctx.font = "500 26px 'Fraunces', serif";
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
+  ctx.fillText('Le Motivateur', cx, cyLogo + 62);
+  ctx.textAlign = 'left';
+
+  // compteur en bas à gauche
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.font = "600 17px 'Work Sans', sans-serif";
+  ctx.fillText(spaced(counterEl.textContent, 2), marginX, H - 44);
+
+  return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+}
+
+shareBtn.addEventListener('click', async () => {
+  const original = shareBtn.textContent;
+  shareBtn.textContent = 'Préparation…';
+  try {
+    if (document.fonts && document.fonts.ready) { await document.fonts.ready; }
+    const blob = await buildShareImage();
+    const fileName = `le-motivateur-${counterEl.textContent.replace(/\D/g,'')}.png`;
+    const file = new File([blob], fileName, { type: 'image/png' });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        files: [file],
+        title: 'Le Motivateur',
+        text: quoteEl.textContent,
+      });
+      shareBtn.textContent = original;
+    } else {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      shareBtn.textContent = 'Image téléchargée';
+      window.setTimeout(() => { shareBtn.textContent = original; }, 1800);
+    }
+  } catch (e) {
+    if (e && e.name === 'AbortError') {
+      shareBtn.textContent = original;
+    } else {
+      shareBtn.textContent = 'Échec, réessaie';
+      window.setTimeout(() => { shareBtn.textContent = original; }, 1800);
+    }
+  }
+});
+
+// premier affichage
+render(pickThought());
+requestAnimationFrame(() => card.classList.add('visible'));
+</script>
+
+</body>
+</html>
